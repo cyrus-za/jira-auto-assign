@@ -32,35 +32,16 @@ async function run() {
     core.debug(`inputs: ${JSON.stringify(inputs, null, 2)}`);
     const { JIRA_TOKEN, GITHUB_TOKEN, JIRA_DOMAIN, ISSUE_KEY } = inputs;
 
-    const {
-      repository,
-      organization: { login: owner },
-      pull_request: pullRequest,
-    } = github.context.payload;
+    const { pull_request: pullRequest } = github.context.payload;
 
-    if (typeof repository === "undefined") {
-      throw new Error(`Missing 'repository' from github action context.`);
-    }
     if (typeof pullRequest === "undefined") {
       throw new Error(`Missing 'pull_request' from github action context.`);
     }
 
-    const { name: repo } = repository;
-
     // github octokit client with given token
     const octokit = github.getOctokit(GITHUB_TOKEN);
 
-    const {
-      data: {
-        head: { user: prOwner },
-      },
-    } = await octokit.pulls.get({
-      owner,
-      repo,
-      pull_number: pullRequest?.number,
-    });
-
-    const username = prOwner?.login;
+    const username = pullRequest.user?.login;
     if (!username) throw new Error("Cannot find PR owner");
 
     const { data: user } = await octokit.users.getByUsername({
@@ -75,15 +56,16 @@ async function run() {
       displayName: user.name,
       issueKey: ISSUE_KEY,
     });
-    if (!jiraUser) throw new Error(`JIRA account not found for ${user.name}`);
+    if (!jiraUser?.displayName)
+      throw new Error(`JIRA account not found for ${user.name}`);
+
     const { assignee } = await jira.getTicketDetails(ISSUE_KEY);
-    if (!assignee) throw new Error("Assignee not found");
-    if (assignee.name === jiraUser.name) {
+    if (assignee?.name === jiraUser.displayName) {
       console.log(`${ISSUE_KEY} is already assigned to ${assignee.name}`);
       return;
     }
     await jira.assignUser({ userId: jiraUser.accountId, issueKey: ISSUE_KEY });
-    console.log(`${ISSUE_KEY} assigned to ${jiraUser.name}`);
+    console.log(`${ISSUE_KEY} assigned to ${jiraUser.displayName}`);
   } catch (error) {
     console.log({ error });
     core.setFailed(error.message);

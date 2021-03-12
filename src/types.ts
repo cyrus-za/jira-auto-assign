@@ -6,7 +6,6 @@ export namespace JIRA {
     key: string;
     accountId: string;
     accountType: string;
-    name: string;
     emailAddress: string;
     avatarUrls: {
       "16x16": string;
