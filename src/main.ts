@@ -71,18 +71,19 @@ async function run() {
 
     const jira = getJIRAClient(JIRA_DOMAIN, JIRA_TOKEN);
 
-    const { accountId, name } = await jira.findUser({
+    const jiraUser = await jira.findUser({
       displayName: user.name,
       issueKey: ISSUE_KEY,
     });
+    if (!jiraUser) throw new Error(`JIRA account not found for ${user.name}`);
     const { assignee } = await jira.getTicketDetails(ISSUE_KEY);
     if (!assignee) throw new Error("Assignee not found");
-    if (assignee.name === name) {
-      console.log(`${ISSUE_KEY} is already assigned to ${name}`);
+    if (assignee.name === jiraUser.name) {
+      console.log(`${ISSUE_KEY} is already assigned to ${assignee.name}`);
       return;
     }
-    await jira.assignUser({ userId: accountId, issueKey: ISSUE_KEY });
-    console.log(`${ISSUE_KEY} assigned to ${name}`);
+    await jira.assignUser({ userId: jiraUser.accountId, issueKey: ISSUE_KEY });
+    console.log(`${ISSUE_KEY} assigned to ${jiraUser.name}`);
   } catch (error) {
     console.log({ error });
     core.setFailed(error.message);
