@@ -9667,12 +9667,12 @@ function run() {
             const { JIRA_TOKEN, GITHUB_TOKEN, JIRA_DOMAIN, ISSUE_KEY } = inputs;
             // github octokit client with given token
             const octokit = github.getOctokit(GITHUB_TOKEN);
-            const { actor } = github.context;
+            const prOwner = github.context.issue.owner;
             const { data: user } = yield octokit.users.getByUsername({
-                username: actor,
+                username: prOwner,
             });
             if (!user.name)
-                throw new Error(`User not found: ${actor}`);
+                throw new Error(`User not found: ${prOwner}`);
             const jira = utils_1.getJIRAClient(JIRA_DOMAIN, JIRA_TOKEN);
             const { accountId, name } = yield jira.findUser({
                 displayName: user.name,
