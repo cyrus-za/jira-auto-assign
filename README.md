@@ -12,7 +12,7 @@ with:
   issue-key: PRJ-123
   jira-token: ${{ secrets.JIRA_TOKEN }}
   github-token: ${{ secrets.GITHUB_TOKEN }}
-  jira-domain: https://your-domain.atlassian.net
+  jira-domain: your-domain.atlassian.net
 ```
 
 ## Inputs
