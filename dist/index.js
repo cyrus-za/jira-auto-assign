@@ -9665,9 +9665,21 @@ function run() {
             const inputs = getInputs();
             core.debug(`inputs: ${JSON.stringify(inputs, null, 2)}`);
             const { JIRA_TOKEN, GITHUB_TOKEN, JIRA_DOMAIN, ISSUE_KEY } = inputs;
+            const { repository, organization: { login: owner }, pull_request: pullRequest, } = github.context.payload;
+            if (typeof repository === "undefined") {
+                throw new Error(`Missing 'repository' from github action context.`);
+            }
+            if (typeof pullRequest === "undefined") {
+                throw new Error(`Missing 'pull_request' from github action context.`);
+            }
+            const { name: repo } = repository;
             // github octokit client with given token
             const octokit = github.getOctokit(GITHUB_TOKEN);
-            const { data: { user: prOwner }, } = yield octokit.pulls.get();
+            const { data: { user: prOwner }, } = yield octokit.pulls.get({
+                owner,
+                repo,
+                pull_number: pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.number,
+            });
             const username = prOwner === null || prOwner === void 0 ? void 0 : prOwner.login;
             if (!username)
                 throw new Error("Cannot find PR owner");
