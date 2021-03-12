@@ -9718,7 +9718,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getJIRAClient = void 0;
 const axios_1 = __importDefault(__nccwpck_require__(6545));
-const getJIRAClient = (baseURL, token) => {
+const getJIRAClient = (domain, token) => {
+    const baseURL = `https://${domain}`;
     const client = axios_1.default.create({
         baseURL: `${baseURL}/rest/api/3`,
         timeout: 2000,
