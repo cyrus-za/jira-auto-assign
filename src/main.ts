@@ -49,9 +49,12 @@ async function run() {
       displayName: user.name,
       issueKey: ISSUE_KEY,
     });
-    await jira.findUser({ displayName: user.name, issueKey: ISSUE_KEY });
+    const { assignee } = await jira.getTicketDetails(ISSUE_KEY);
+    if (assignee.name === name) {
+      console.log(`${ISSUE_KEY} is already assigned to ${name}`);
+      return;
+    }
     await jira.assignUser({ userId: accountId, issueKey: ISSUE_KEY });
-
     console.log(`${ISSUE_KEY} assigned to ${name}`);
   } catch (error) {
     console.log({ error });

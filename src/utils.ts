@@ -45,6 +45,7 @@ export const getJIRAClient = (baseURL: string, token: string): JIRAClient => {
       const issue: JIRA.Issue = await getIssue(key);
       const {
         fields: {
+          assignee,
           issuetype: type,
           project,
           summary,
@@ -70,6 +71,7 @@ export const getJIRAClient = (baseURL: string, token: string): JIRAClient => {
           name: type.name,
           icon: type.iconUrl,
         },
+        assignee,
         project: {
           name: project.name,
           url: `${baseURL}/browse/${project.key}`,

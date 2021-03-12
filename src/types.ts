@@ -92,12 +92,19 @@ export namespace JIRA {
     name: string;
   }
 
+  export interface IssueASsignee {
+    self: string;
+    name: string;
+    emailAddress: string;
+  }
+
   export interface Issue {
     id: string;
     key: string;
     self: string;
     status: string;
     fields: {
+      assignee: IssueASsignee;
       summary: string;
       status: IssueStatus;
       priority: IssuePriority;
@@ -124,6 +131,10 @@ export interface JIRADetails {
     key: string;
   };
   estimate: string | number;
+  assignee: {
+    name: string;
+    emailAddress: string;
+  };
   labels: readonly { name: string; url: string }[];
 }
 
