@@ -9667,12 +9667,15 @@ function run() {
             const { JIRA_TOKEN, GITHUB_TOKEN, JIRA_DOMAIN, ISSUE_KEY } = inputs;
             // github octokit client with given token
             const octokit = github.getOctokit(GITHUB_TOKEN);
-            const prOwner = github.context.issue.owner;
+            const { data: { user: prOwner }, } = yield octokit.pulls.get();
+            const username = prOwner === null || prOwner === void 0 ? void 0 : prOwner.login;
+            if (!username)
+                throw new Error("Cannot find PR owner");
             const { data: user } = yield octokit.users.getByUsername({
-                username: prOwner,
+                username,
             });
             if (!user.name)
-                throw new Error(`User not found: ${prOwner}`);
+                throw new Error(`User not found: ${user.name}`);
             const jira = utils_1.getJIRAClient(JIRA_DOMAIN, JIRA_TOKEN);
             const { accountId, name } = yield jira.findUser({
                 displayName: user.name,
@@ -9728,7 +9731,7 @@ const getJIRAClient = (domain, token) => {
     const findUser = ({ displayName, issueKey, }) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const projectKey = issueKey.split("-")[0];
-            const { data } = yield client.get(`/user/assignable/multiProjectSearch?query=${displayName}&projectKeys=${projectKey}'`);
+            const { data } = yield client.get(`/user/assignable/multiProjectSearch?query=${displayName}&projectKeys=${projectKey}`);
             return data === null || data === void 0 ? void 0 : data[0];
         }
         catch (e) {
