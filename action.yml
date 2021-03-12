@@ -14,7 +14,6 @@ inputs:
   jira-token:
     description: "JIRA token (see readme)"
     required: true
-    default: ${{ secrets.JIRA_TOKEN }}
   jira-domain:
     description: "JIRA domain (e.g mydomain.atlassian.net)"
     required: true
