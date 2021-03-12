@@ -9689,19 +9689,21 @@ function run() {
             if (!(user === null || user === void 0 ? void 0 : user.name))
                 throw new Error(`User not found: ${user === null || user === void 0 ? void 0 : user.name}`);
             const jira = utils_1.getJIRAClient(JIRA_DOMAIN, JIRA_TOKEN);
-            const { accountId, name } = yield jira.findUser({
+            const jiraUser = yield jira.findUser({
                 displayName: user.name,
                 issueKey: ISSUE_KEY,
             });
+            if (!jiraUser)
+                throw new Error(`JIRA account not found for ${user.name}`);
             const { assignee } = yield jira.getTicketDetails(ISSUE_KEY);
             if (!assignee)
                 throw new Error("Assignee not found");
-            if (assignee.name === name) {
-                console.log(`${ISSUE_KEY} is already assigned to ${name}`);
+            if (assignee.name === jiraUser.name) {
+                console.log(`${ISSUE_KEY} is already assigned to ${assignee.name}`);
                 return;
             }
-            yield jira.assignUser({ userId: accountId, issueKey: ISSUE_KEY });
-            console.log(`${ISSUE_KEY} assigned to ${name}`);
+            yield jira.assignUser({ userId: jiraUser.accountId, issueKey: ISSUE_KEY });
+            console.log(`${ISSUE_KEY} assigned to ${jiraUser.name}`);
         }
         catch (error) {
             console.log({ error });
