@@ -35,13 +35,13 @@ async function run() {
     // github octokit client with given token
     const octokit = github.getOctokit(GITHUB_TOKEN);
 
-    const { actor } = github.context;
+    const prOwner = github.context.issue.owner;
 
     const { data: user } = await octokit.users.getByUsername({
-      username: actor,
+      username: prOwner,
     });
 
-    if (!user.name) throw new Error(`User not found: ${actor}`);
+    if (!user.name) throw new Error(`User not found: ${prOwner}`);
 
     const jira = getJIRAClient(JIRA_DOMAIN, JIRA_TOKEN);
 
