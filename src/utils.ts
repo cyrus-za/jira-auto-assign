@@ -2,8 +2,9 @@ import axios from "axios";
 import { JIRA, JIRAClient } from "./types";
 
 export const getJIRAClient = (domain: string, token: string): JIRAClient => {
+  const baseURL = `https://${domain}`;
   const client = axios.create({
-    baseURL: `https://${domain}/rest/api/3`,
+    baseURL: `${baseURL}/rest/api/3`,
     timeout: 2000,
     headers: { Authorization: `Basic ${token}` },
   });
