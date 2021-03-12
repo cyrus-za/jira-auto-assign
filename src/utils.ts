@@ -16,7 +16,7 @@ export const getJIRAClient = (domain: string, token: string): JIRAClient => {
     try {
       const projectKey = issueKey.split("-")[0];
       const { data } = await client.get<JIRA.User[]>(
-        `/user/assignable/multiProjectSearch?query=${displayName}&projectKeys=${projectKey}'`
+        `/user/assignable/multiProjectSearch?query=${displayName}&projectKeys=${projectKey}`
       );
       return data?.[0];
     } catch (e) {
