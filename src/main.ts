@@ -51,7 +51,9 @@ async function run() {
     const octokit = github.getOctokit(GITHUB_TOKEN);
 
     const {
-      data: { user: prOwner },
+      data: {
+        head: { user: prOwner },
+      },
     } = await octokit.pulls.get({
       owner,
       repo,
