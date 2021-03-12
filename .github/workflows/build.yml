@@ -4,6 +4,9 @@ on: push
 
 jobs:
   build:
+    if:
+      contains(github.event.pull_request.user.login, 'renovate') != 'true' &&
+      contains(github.actor, 'renovate') != 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
