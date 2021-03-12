@@ -9678,7 +9678,11 @@ function run() {
                 displayName: user.name,
                 issueKey: ISSUE_KEY,
             });
-            yield jira.findUser({ displayName: user.name, issueKey: ISSUE_KEY });
+            const { assignee } = yield jira.getTicketDetails(ISSUE_KEY);
+            if (assignee.name === name) {
+                console.log(`${ISSUE_KEY} is already assigned to ${name}`);
+                return;
+            }
             yield jira.assignUser({ userId: accountId, issueKey: ISSUE_KEY });
             console.log(`${ISSUE_KEY} assigned to ${name}`);
         }
@@ -9747,7 +9751,7 @@ const getJIRAClient = (baseURL, token) => {
     const getTicketDetails = (key) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const issue = yield getIssue(key);
-            const { fields: { issuetype: type, project, summary, customfield_10016: estimate, labels: rawLabels, status: issueStatus, }, } = issue;
+            const { fields: { assignee, issuetype: type, project, summary, customfield_10016: estimate, labels: rawLabels, status: issueStatus, }, } = issue;
             const labels = rawLabels.map((label) => ({
                 name: label,
                 url: `${baseURL}/issues?jql=${encodeURIComponent(`project = ${project.key} AND labels = ${label} ORDER BY created DESC`)}`,
@@ -9761,6 +9765,7 @@ const getJIRAClient = (baseURL, token) => {
                     name: type.name,
                     icon: type.iconUrl,
                 },
+                assignee,
                 project: {
                     name: project.name,
                     url: `${baseURL}/browse/${project.key}`,
