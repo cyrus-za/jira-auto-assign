@@ -9728,7 +9728,7 @@ const getJIRAClient = (domain, token) => {
     const findUser = ({ displayName, issueKey, }) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const projectKey = issueKey.split("-")[0];
-            const { data } = yield client.get(`user/assignable/multiProjectSearch?query=${displayName}&projectKeys=${projectKey}'`);
+            const { data } = yield client.get(`/user/assignable/multiProjectSearch?query=${displayName}&projectKeys=${projectKey}'`);
             return data === null || data === void 0 ? void 0 : data[0];
         }
         catch (e) {
