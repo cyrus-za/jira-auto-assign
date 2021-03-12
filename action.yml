@@ -1,0 +1,23 @@
+name: "JIRA Auto Assign"
+description: "Automatically assign a JIRA issue"
+author: "cyrus-za"
+branding:
+  icon: "check"
+  color: "green"
+inputs:
+  issue-key:
+    description: "The JIRA ticket ID e.g. PRJ-123"
+    required: true
+  github-token:
+    description: "Github token. Default: {{ secrets.GITHUB_TOKEN }}"
+    required: true
+  jira-token:
+    description: "JIRA token (see readme)"
+    required: true
+    default: ${{ secrets.JIRA_TOKEN }}
+  jira-domain:
+    description: "JIRA domain (e.g mydomain.atlassian.net)"
+    required: true
+runs:
+  using: "node12"
+  main: "dist/index.js"
