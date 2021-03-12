@@ -65,7 +65,7 @@ async function run() {
       username,
     });
 
-    if (!user.name) throw new Error(`User not found: ${user.name}`);
+    if (!user?.name) throw new Error(`User not found: ${user?.name}`);
 
     const jira = getJIRAClient(JIRA_DOMAIN, JIRA_TOKEN);
 
@@ -74,6 +74,7 @@ async function run() {
       issueKey: ISSUE_KEY,
     });
     const { assignee } = await jira.getTicketDetails(ISSUE_KEY);
+    if (!assignee) throw new Error("Assignee not found");
     if (assignee.name === name) {
       console.log(`${ISSUE_KEY} is already assigned to ${name}`);
       return;
