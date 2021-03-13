@@ -9660,27 +9660,19 @@ const getInputs = () => {
     };
 };
 function run() {
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const inputs = getInputs();
             core.debug(`inputs: ${JSON.stringify(inputs, null, 2)}`);
             const { JIRA_TOKEN, GITHUB_TOKEN, JIRA_DOMAIN, ISSUE_KEY } = inputs;
-            const { repository, organization: { login: owner }, pull_request: pullRequest, } = github.context.payload;
-            if (typeof repository === "undefined") {
-                throw new Error(`Missing 'repository' from github action context.`);
-            }
+            const { pull_request: pullRequest } = github.context.payload;
             if (typeof pullRequest === "undefined") {
                 throw new Error(`Missing 'pull_request' from github action context.`);
             }
-            const { name: repo } = repository;
             // github octokit client with given token
             const octokit = github.getOctokit(GITHUB_TOKEN);
-            const { data: { head: { user: prOwner }, }, } = yield octokit.pulls.get({
-                owner,
-                repo,
-                pull_number: pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.number,
-            });
-            const username = prOwner === null || prOwner === void 0 ? void 0 : prOwner.login;
+            const username = (_a = pullRequest.user) === null || _a === void 0 ? void 0 : _a.login;
             if (!username)
                 throw new Error("Cannot find PR owner");
             const { data: user } = yield octokit.users.getByUsername({
@@ -9693,17 +9685,15 @@ function run() {
                 displayName: user.name,
                 issueKey: ISSUE_KEY,
             });
-            if (!jiraUser)
+            if (!(jiraUser === null || jiraUser === void 0 ? void 0 : jiraUser.displayName))
                 throw new Error(`JIRA account not found for ${user.name}`);
             const { assignee } = yield jira.getTicketDetails(ISSUE_KEY);
-            if (!assignee)
-                throw new Error("Assignee not found");
-            if (assignee.name === jiraUser.name) {
+            if ((assignee === null || assignee === void 0 ? void 0 : assignee.name) === jiraUser.displayName) {
                 console.log(`${ISSUE_KEY} is already assigned to ${assignee.name}`);
                 return;
             }
             yield jira.assignUser({ userId: jiraUser.accountId, issueKey: ISSUE_KEY });
-            console.log(`${ISSUE_KEY} assigned to ${jiraUser.name}`);
+            console.log(`${ISSUE_KEY} assigned to ${jiraUser.displayName}`);
         }
         catch (error) {
             console.log({ error });
@@ -9747,7 +9737,9 @@ const getJIRAClient = (domain, token) => {
     const findUser = ({ displayName, issueKey, }) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const projectKey = issueKey.split("-")[0];
-            const { data } = yield client.get(`/user/assignable/multiProjectSearch?query=${displayName}&projectKeys=${projectKey}`);
+            const firstName = displayName.split(" ")[0].toLowerCase();
+            const { data } = yield client.get(`/user/assignable/multiProjectSearch?query=${firstName}&projectKeys=${projectKey}`);
+            console.log(data[0].accountId);
             return data === null || data === void 0 ? void 0 : data[0];
         }
         catch (e) {
