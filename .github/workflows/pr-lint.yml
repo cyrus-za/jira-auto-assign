@@ -13,8 +13,4 @@ jobs:
     steps:
       - uses: morrisoncole/pr-lint-action@main
         with:
-          title-regex: "#[eE][xX]-[0-9]+"
-          on-failed-regex-fail-action: false
-          on-failed-regex-create-review: true
-          on-failed-regex-request-changes: false
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
